@@ -1,0 +1,187 @@
+# templates/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Developer Portfolio</title>
+    <meta name="description" content="Professional Python developer portfolio showcasing web development projects, skills, and expertise">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="/dashboard-console-capture.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#home" class="nav-logo">Portfolio</a>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#home" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">About</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#skills" class="nav-link">Skills</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#projects" class="nav-link">Projects</a>
+                </li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            {% if about and about.metadata.headshot %}
+            <div class="hero-image">
+                <img src="{{ about.metadata.headshot.imgix_url }}?w=300&h=300&fit=crop&auto=format,compress" 
+                     alt="Professional headshot" 
+                     class="profile-image">
+            </div>
+            {% endif %}
+            <div class="hero-content">
+                <h1 class="hero-title">Python Developer</h1>
+                {% if about %}
+                <p class="hero-subtitle">{{ about.metadata.current_role or 'Full Stack Developer' }}</p>
+                <p class="hero-location">{{ about.metadata.location or 'Remote' }}</p>
+                {% if about.metadata.total_experience %}
+                <p class="hero-experience">{{ about.metadata.total_experience }}+ years of experience</p>
+                {% endif %}
+                {% endif %}
+                <div class="hero-buttons">
+                    <a href="#projects" class="btn btn-primary">View Projects</a>
+                    <a href="#about" class="btn btn-secondary">About Me</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    {% if about %}
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    {{ about.metadata.bio | safe }}
+                </div>
+                {% if about.metadata.resume %}
+                <div class="about-actions">
+                    <a href="{{ about.metadata.resume.url }}" 
+                       class="btn btn-primary" 
+                       target="_blank" 
+                       rel="noopener noreferrer">
+                        Download Resume
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Skills Section -->
+    <section id="skills" class="skills">
+        <div class="container">
+            <h2 class="section-title">Technical Skills</h2>
+            <div class="skills-grid">
+                {% for category_key, category_data in skills.items() %}
+                <div class="skill-category">
+                    <h3 class="category-title">{{ category_data.name }}</h3>
+                    <div class="skill-list">
+                        {% for skill in category_data.skills %}
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span class="skill-name">{{ skill.metadata.name }}</span>
+                                <span class="skill-level skill-level-{{ skill.metadata.proficiency.key }}">
+                                    {{ skill.metadata.proficiency.value }}
+                                </span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress skill-progress-{{ skill.metadata.proficiency.key }}"></div>
+                            </div>
+                            {% if skill.metadata.years_experience %}
+                            <span class="skill-years">{{ skill.metadata.years_experience }} years</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects">
+        <div class="container">
+            <h2 class="section-title">Featured Projects</h2>
+            <div class="projects-grid">
+                {% for project in projects %}
+                <div class="project-card">
+                    {% if project.metadata.screenshot %}
+                    <div class="project-image">
+                        <img src="{{ project.metadata.screenshot.imgix_url }}?w=400&h=250&fit=crop&auto=format,compress" 
+                             alt="{{ project.title }}" 
+                             loading="lazy">
+                    </div>
+                    {% endif %}
+                    <div class="project-content">
+                        <div class="project-category">
+                            {{ project.metadata.category.value }}
+                        </div>
+                        <h3 class="project-title">{{ project.title }}</h3>
+                        <div class="project-description">
+                            {{ project.metadata.description | safe }}
+                        </div>
+                        <div class="project-tech">
+                            <h4>Tech Stack:</h4>
+                            <p>{{ project.metadata.tech_stack }}</p>
+                        </div>
+                        <div class="project-links">
+                            {% if project.metadata.github_url %}
+                            <a href="{{ project.metadata.github_url }}" 
+                               class="project-link" 
+                               target="_blank" 
+                               rel="noopener noreferrer">
+                                GitHub
+                            </a>
+                            {% endif %}
+                            {% if project.metadata.demo_url %}
+                            <a href="{{ project.metadata.demo_url }}" 
+                               class="project-link project-link-primary" 
+                               target="_blank" 
+                               rel="noopener noreferrer">
+                                Live Demo
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; {{ "now" | strftime("%Y") }} Python Developer Portfolio. Built with FastAPI and Cosmic CMS.</p>
+            <div class="footer-links">
+                <a href="/docs" target="_blank" rel="noopener noreferrer">API Docs</a>
+                <a href="https://www.cosmicjs.com" target="_blank" rel="noopener noreferrer">Powered by Cosmic</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', path='/js/main.js') }}"></script>
+</body>
+</html>
